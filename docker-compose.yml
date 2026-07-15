@@ -1,0 +1,32 @@
+# Orquesta el set de pruebas: un provider vivo + un contenedor que corre pytest.
+#
+#   docker compose up --build --abort-on-container-exit --exit-code-from tests
+#
+# El provider escucha en 8000 (interno). El host puede alcanzarlo en
+# PROVIDER_HOST_PORT (default 8000; cambialo si el 8000 esta ocupado en tu host).
+
+services:
+  provider:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: moderation-provider
+    ports:
+      - "${PROVIDER_HOST_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 2s
+
+  tests:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    image: moderation-tests
+    environment:
+      BASE_URL: "http://provider:8000"
+    depends_on:
+      provider:
+        condition: service_healthy

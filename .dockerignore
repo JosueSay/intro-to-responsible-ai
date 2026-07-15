@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.git/
+.claude/
+docs/
+scripts/
+Makefile
+README.md
+instrucciones.md
+*.bak
+.pytest_cache/

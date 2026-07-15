@@ -1,0 +1,2 @@
+# Dependencias solo para correr las pruebas (la app en si es stdlib pura).
+pytest>=8,<9

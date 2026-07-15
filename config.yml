@@ -1,0 +1,38 @@
+# Configuración del servicio de moderación
+# Todo lo controlable vive aquí (nada hardcodeado en el código).
+
+# --- Servidor (Provider) ---
+host: "0.0.0.0"        # NO usar localhost (debe ser accesible en la red)
+port: 8000
+
+# --- Cliente (Consumer) ---
+client_timeout: 5      # segundos: timeout del POST (requisito del lab: 5s)
+
+# --- Parámetros de moderación (afinar sin tocar código) ---
+moderation:
+  base_confidence: 0.6         # confianza base cuando hay >=1 coincidencia
+  confidence_per_match: 0.1    # cuánto sube la confianza por cada keyword extra
+  max_confidence: 0.99         # tope de confianza para 'blocked'
+  allowed_confidence: 0.95     # confianza reportada cuando se permite
+  case_sensitive: false        # si false, ignora mayúsculas/acentos
+
+# --- Reglas de moderación por keywords ---
+# Si el texto contiene alguna de estas palabras -> verdict = "blocked".
+blocked_keywords:
+  - idiota
+  - estupido
+  - estúpido
+  - imbecil
+  - imbécil
+  - matar
+  - odio
+  - violencia
+  - droga
+  - drogas
+  - bomba
+  - terrorismo
+  - hack
+  - hackear
+  - password
+  - tarjeta de credito
+  - spam
