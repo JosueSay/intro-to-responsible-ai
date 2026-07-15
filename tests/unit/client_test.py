@@ -35,7 +35,8 @@ class TestDescribeHttpError:
         assert "no encontrado (404)" in describe_http_error(404, "x")
 
     def test_5xx_servidor(self):
-        assert describe_http_error(500, "boom") == "Error del servidor (500): boom"
+        # Formato exacto del enunciado (sin el código).
+        assert describe_http_error(500, "boom") == "Error del servidor: boom"
 
     def test_otro_4xx_generico(self):
         assert describe_http_error(422, "x") == "Error de cliente (422): x"

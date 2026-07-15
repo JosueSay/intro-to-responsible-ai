@@ -69,7 +69,8 @@ def describe_http_error(code, msg):
     if 400 <= code < 500:
         return f"Error de cliente ({code}): {msg}"
     if 500 <= code < 600:
-        return f"Error del servidor ({code}): {msg}"
+        # Formato exacto del enunciado: "Error del servidor: <msg>"
+        return f"Error del servidor: {msg}"
     return f"Respuesta inesperada ({code}): {msg}"
 
 
