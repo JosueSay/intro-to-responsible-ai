@@ -1,7 +1,7 @@
 """Pruebas de integracion contra el provider vivo (HTTP/JSON)."""
 
 from tests.fixtures.samples import ALLOWED_TEXT, BLOCKED_TEXT
-from tests.helpers.api import get_health, post_moderate
+from tests.helpers.api import get_health, post_moderate, request
 
 
 class TestModerateApi:
@@ -80,6 +80,30 @@ class TestModerateApi:
         # Assert
         assert body["verdict"] == "allowed"
         assert body.get("reason")
+
+
+class TestMethodNotAllowed:
+    """/moderate solo acepta POST -> 405 con header Allow en otros métodos."""
+
+    def test_get_moderate_405(self, base_url):
+        # Act
+        status, allow = request(base_url, "GET", "/moderate")
+        # Assert
+        assert status == 405
+        assert allow == "POST"
+
+    def test_put_moderate_405(self, base_url):
+        # Act
+        status, allow = request(base_url, "PUT", "/moderate")
+        # Assert
+        assert status == 405
+        assert allow == "POST"
+
+    def test_ruta_desconocida_404(self, base_url):
+        # Act
+        status, _ = request(base_url, "GET", "/otra-cosa")
+        # Assert
+        assert status == 404
 
 
 class TestHealth:

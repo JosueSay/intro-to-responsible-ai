@@ -44,3 +44,13 @@ def get_health(base_url, timeout=5):
     """Hace GET /health y devuelve el cuerpo parseado."""
     with urllib.request.urlopen(f"{base_url}/health", timeout=timeout) as resp:
         return json.loads(resp.read().decode("utf-8"))
+
+
+def request(base_url, method, path="/moderate", timeout=5):
+    """Hace una petición con un método arbitrario y devuelve (status, allow_header)."""
+    req = urllib.request.Request(f"{base_url}{path}", method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status, resp.headers.get("Allow")
+    except urllib.error.HTTPError as exc:
+        return exc.code, exc.headers.get("Allow")

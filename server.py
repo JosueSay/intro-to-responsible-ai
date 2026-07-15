@@ -21,11 +21,13 @@ CONFIG = load_config()
 class ModerationHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
-    def _send_json(self, status, payload):
+    def _send_json(self, status, payload, extra_headers=None):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        for name, value in (extra_headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
         # log estilo: [POST /moderate] 192.168.1.10 -> 200 {...}
@@ -71,8 +73,24 @@ class ModerationHandler(BaseHTTPRequestHandler):
         # Endpoint de salud opcional para probar rápido en el navegador.
         if self.path in ("/", "/health"):
             self._send_json(200, {"status": "ok", "service": "moderation"})
+        elif self.path == "/moderate":
+            # /moderate existe pero solo por POST -> 405, no 404.
+            self._send_json(405, {"error": "method not allowed, use POST"},
+                            extra_headers={"Allow": "POST"})
         else:
             self._send_json(404, {"error": "not found"})
+
+    def _reject_method(self):
+        """Métodos no soportados (PUT/DELETE/PATCH) -> 405 en /moderate, 404 resto."""
+        if self.path == "/moderate":
+            self._send_json(405, {"error": "method not allowed, use POST"},
+                            extra_headers={"Allow": "POST"})
+        else:
+            self._send_json(404, {"error": "not found"})
+
+    do_PUT = _reject_method
+    do_DELETE = _reject_method
+    do_PATCH = _reject_method
 
     def log_message(self, *args):
         pass  # silenciamos el log por defecto; usamos el nuestro
